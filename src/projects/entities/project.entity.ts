@@ -12,24 +12,39 @@ export class Project {
   @Column('text')
   description: string;
 
-  @Column()
-  image: string;
+  @Column('text')
+  imageUrl: string;
 
   @Column()
   location: string;
 
   @Column()
-  units: number;
+  totalFloors: number;
+
+  @Column('json')
+  flatTypes: {
+    type: string;
+    size: number;
+  }[];
 
   @Column()
-  progress: number;
+  landArea: number;
 
   @Column({
     type: 'enum',
     enum: ['completed', 'ongoing', 'upcoming'],
-    default: 'upcoming' 
+    default: 'upcoming'
   })
-  status: 'completed' | 'ongoing' | 'upcoming'
+  status: 'completed' | 'ongoing' | 'upcoming';
+
+  @Column()
+  startingPrice: number;
+
+  @Column({ nullable: true })
+  parking: boolean;
+
+  @Column({ nullable: true })
+  elevator: boolean;
 
   @CreateDateColumn()
   createdAt: Date;

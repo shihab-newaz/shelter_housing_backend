@@ -1,54 +1,69 @@
 // src/projects/dto/create-project.dto.ts
-import { IsString, IsNumber, IsEnum, Min, Max } from 'class-validator';
+import { IsString, IsNumber, IsEnum, IsArray, IsBoolean, ValidateNested } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+
+class FlatTypeDto {
+  @ApiProperty({ example: 'Type-A' })
+  @IsString()
+  type: string;
+
+  @ApiProperty({ example: 1350 })
+  @IsNumber()
+  size: number;
+}
 
 export class CreateProjectDto {
   @ApiProperty({
-    example: 'Luxury Villa',
+    example: 'Jamal Tower',
     description: 'The name of the project'
   })
   @IsString()
   title: string;
 
   @ApiProperty({
-    example: 'A beautiful luxury villa with ocean view',
+    example: 'Luxury apartment building with modern amenities',
     description: 'Detailed description of the project'
   })
   @IsString()
   description: string;
 
   @ApiProperty({
-    example: 'villa.jpg',
-    description: 'Project image filename'
+    example: 'https://example.com/image.jpg',
+    description: 'URL of the project image'
   })
   @IsString()
-  image: string;
+  imageUrl: string;
 
   @ApiProperty({
-    example: 'Malibu Beach',
+    example: 'Dhaka',
     description: 'Project location'
   })
   @IsString()
   location: string;
 
   @ApiProperty({
-    example: 120,
-    description: 'Number of units in the project'
+    example: 7,
+    description: 'Total number of floors (G+6)'
   })
   @IsNumber()
-  @Min(1)
-  units: number;
+  totalFloors: number;
 
   @ApiProperty({
-    example: 75,
-    description: 'Project completion percentage',
-    minimum: 0,
-    maximum: 100
+    type: [FlatTypeDto],
+    description: 'Available flat types and their sizes'
+  })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => FlatTypeDto)
+  flatTypes: FlatTypeDto[];
+
+  @ApiProperty({
+    example: 5,
+    description: 'Land area in katha'
   })
   @IsNumber()
-  @Min(0)
-  @Max(100)
-  progress: number;
+  landArea: number;
 
   @ApiProperty({
     enum: ['completed', 'ongoing', 'upcoming'],
@@ -56,4 +71,25 @@ export class CreateProjectDto {
   })
   @IsEnum(['completed', 'ongoing', 'upcoming'])
   status: 'completed' | 'ongoing' | 'upcoming';
+
+  @ApiProperty({
+    example: 15000000,
+    description: 'Starting price of units'
+  })
+  @IsNumber()
+  startingPrice: number;
+
+  @ApiProperty({
+    example: true,
+    description: 'Available parking'
+  })
+  @IsBoolean()
+  parking: boolean;
+
+  @ApiProperty({
+    example: true,
+    description: 'Elevator availability'
+  })
+  @IsBoolean()
+  elevator: boolean;
 }
