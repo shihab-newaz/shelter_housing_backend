@@ -24,8 +24,8 @@ async function bootstrap() {
 
   app.enableCors({
     origin: [
-      'http://localhost:3000', // Next.js development
-      'https://your-nextjs-domain.com', // Production domain
+      'http://localhost:3000', 
+      'https://www.shelterhousinglimited.com/', 
     ],
     credentials: true,
   });
