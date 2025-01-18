@@ -1,6 +1,21 @@
 // src/projects/controllers/project.controller.ts
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Query } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  UseGuards,
+  Query,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { ProjectService } from '../services/project.service';
 import { CreateProjectDto } from '../dto/create-project.dto';
 import { UpdateProjectDto } from '../dto/update-project.dto';
@@ -15,11 +30,22 @@ export class ProjectController {
   @ApiResponse({ status: 200, description: 'Returns all projects' })
   @Get()
   async findAll(
-    @Query('status') status?: 'completed' | 'ongoing' | 'upcoming'
+    @Query('status') status?: 'completed' | 'ongoing' | 'upcoming',
   ) {
+    if (status) {
+      return this.projectService.findByStatus(status);
+    }
     return this.projectService.findAll();
   }
 
+  @ApiOperation({ summary: 'Get project by ID' })
+  @ApiResponse({ status: 200, description: 'Returns the project' })
+  @ApiResponse({ status: 404, description: 'Project not found' })
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    return this.projectService.findOne(+id);
+  }
+  
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a new project' })
   @ApiResponse({ status: 201, description: 'Project created successfully' })
@@ -37,7 +63,7 @@ export class ProjectController {
   @Put(':id')
   async update(
     @Param('id') id: string,
-    @Body() updateProjectDto: UpdateProjectDto
+    @Body() updateProjectDto: UpdateProjectDto,
   ) {
     return this.projectService.update(+id, updateProjectDto);
   }
