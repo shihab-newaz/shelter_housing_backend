@@ -31,8 +31,37 @@ export class ProjectRepository {
   }
 
   async update(id: number, updateProjectDto: UpdateProjectDto): Promise<Project | null> {
-    await this.projectRepository.update(id, updateProjectDto);
-    return this.findById(id);
+    // First check if project exists
+    const existingProject = await this.findById(id);
+    if (!existingProject) {
+      return null;
+    }
+  
+    // Use TypeORM's queryRunner for transaction handling
+    const queryRunner = this.projectRepository.manager.connection.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+  
+    try {
+      // Perform the update
+      await queryRunner.manager.update(Project, id, updateProjectDto);
+      
+      // Get the updated project
+      const updatedProject = await queryRunner.manager.findOne(Project, {
+        where: { id }
+      });
+  
+      // Commit the transaction
+      await queryRunner.commitTransaction();
+      return updatedProject;
+    } catch (err) {
+      // Rollback in case of error
+      await queryRunner.rollbackTransaction();
+      throw err;
+    } finally {
+      // Release the queryRunner
+      await queryRunner.release();
+    }
   }
 
   async remove(id: number): Promise<void> {
